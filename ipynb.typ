@@ -1,7 +1,7 @@
 #set page(
   paper: "a4",
-  columns: 2,
   numbering: "1",
+  columns: 2,
   margin: (
     left: 1.2cm,
     right: 1.2cm
@@ -1071,3 +1071,5 @@ layout mais agradável. O notebook `ipynb` usado para gerar o relatório
 e que contém os outputs originais está disponível no GitHub:
 #underline[#link("https://github.com/pedrotokar/statsmodeling-A2");].
 ] <0c265677-fe9a-4604-8c51-2f36df1d59be>
+
+#bibliography("ref.bib", full: true, title: "Referências")
