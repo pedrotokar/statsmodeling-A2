@@ -1,33 +1,79 @@
 #set page(
-  paper:"a4"
+  paper: "a4",
+  columns: 2,
+  numbering: "1",
+  margin: (
+    left: 1.2cm,
+    right: 1.2cm
+)
 )
 #set text(
-  size:16pt,  
-  font:"DejaVu serif"
+  size: 9pt,
+  font: "PT Serif",
+  stretch: 30%,
+  lang: "bzs"
 )
 
-#block[
-= Modelagem Estatística - Sobredispersão em Modelos de Contagem
-<modelagem-estatística---sobredispersão-em-modelos-de-contagem>
-#strong[Aluno];: Pedro Santos Tokar | #strong[Curso];: Ciência de Dados
-e Inteligência Artificial, 5º período | #strong[Matrícula];: 231708008
+#set par(justify: true)
 
-== Introdução
-<introdução>
-Este documento é referente ao trabalho auxiliar passado na matéria de
-Modelagem Estatística, ofertada na FGV - EMAp. A motivação do trabalho é
-ter uma experiência prática com o ajuste de modelos estatísticos (mais
-específicamente, o GLM Poisson). Durante o desenvolvimento deste
-trabalho, uma base de dados reais será analisada e diferentes modelos
-estatísticos serão ajustados aos dados desta base. Os resultados de cada
-modelo serão discutidos e usados para exemplificar conceitos conhecidos
-da modelagem estatística.
+#show raw.where(block: true): r => {
+    r
+}
 
-] <a928ba25-8b7a-484f-bb1d-9a39bd3423e9>
+#show figure: it => {
+  set text(8pt)
+  it
+}
+
+#place(
+  top + center,
+  float: true,
+  scope: "parent",
+  text()[
+    #text(2em, weight: "bold")[
+      Sobredispersão em Modelos de Contagem.
+      <modelagem-estatística---sobredispersão-em-modelos-de-contagem>
+    ]  
+    
+    _Modelagem Estatística - FGV EMAp._
+
+    _Professor: Luiz Max Fagundes de Carvalho._
+    
+    #grid(
+      columns: (25%, 50%, 25%),
+      rows: (auto, auto),
+      gutter: 7pt,
+      strong[Aluno],
+      strong[Curso],
+      strong[Matrícula],
+      text[Pedro Santos Tokar],
+      text[Ciência de Dados e Inteligência Artificial, 5º período],
+      text[231708008]
+    )
+    #line(start: (0%, 0%), end: (100%, 0%), stroke: (thickness: 1pt))
+
+    #block(width: 85%)[
+      == Introdução
+      <introdução>
+      Este documento é referente ao trabalho auxiliar passado na matéria de
+      Modelagem Estatística, e sua motivação é fornecer uma experiência prática 
+      com o ajuste de modelos estatísticos de contagem. Durante o desenvolvimento 
+      deste trabalho, uma base de dados reais será analisada e diferentes modelos
+      estatísticos serão ajustados aos dados desta base. Os resultados de cada
+      modelo serão discutidos e usados para exemplificar conceitos conhecidos
+      da modelagem estatística.
+    
+    ] <a928ba25-8b7a-484f-bb1d-9a39bd3423e9>
+    #linebreak()
+    #linebreak()
+  ]
+)
+
 #block[
 ] <51278e60-c72b-414c-9848-9cf251f1f4c3>
 #block[
 == 1. Entendendo os dados
+#linebreak()
 <1-entendendo-os-dados>
 Iremos trabalhar com a base de dados #emph[RecreationDemand];,
 disponível no pacote `Applied Econometrics with R`. Ela contém
@@ -39,8 +85,8 @@ uma para entender seu significado.
 ] <0350dd90-6651-441a-8e13-b4201e76f31a>
 #block[
 #block[
+  #set text(size: 10pt)
 ```
-<class 'pandas.core.frame.DataFrame'>
 RangeIndex: 659 entries, 0 to 658
 Data columns (total 8 columns):
  #   Column   Non-Null Count  Dtype  
@@ -53,8 +99,7 @@ Data columns (total 8 columns):
  5   costC    659 non-null    float64
  6   costS    659 non-null    float64
  7   costH    659 non-null    float64
-dtypes: float64(3), int64(3), object(2)
-memory usage: 41.3+ KB
+
 ```
 
 ]
@@ -65,7 +110,7 @@ de barco que os proprietários fizeram para o Lago Sommervile, e é a
 nossa #strong[variável dependente];, pois é ela que temos interesse em
 regredir. A utilidade dessa regressão está em entender que fatores
 (principalmente econômicos) podem ou não influenciar a decisão de uma
-pessoa de visitar ou não o lago a passeio.
+pessoa de visitar ou não o lago a passeio. Suas estatísticas e distribuição são:
 
 ] <49b3024c-cc2d-4e55-a10b-d0a8f937ae89>
 #block[
@@ -80,7 +125,7 @@ pessoa de visitar ou não o lago a passeio.
 #block[
 #figure(
   image("./media/9105d65b8a990e2211df5a785e0476f27b9b4ac8.png"),
-  caption: [legenda]
+  caption: [distribuição de `trips`]
 )
 
 ]
@@ -101,20 +146,13 @@ distribuição da variável, é possível plotar ignorando valores 0:
 
 ]
 ] <ff789ac0-cbd9-43ca-876e-b2a7174047a4>
-#block[
-#block[
-```
-Text(0, 0.5, 'Trips')
-```
 
-]
 #block[
 #figure(
   image("./media/d05c87558c77026b8f41d6a04418777c2e72341b.png"),
-  caption: [legenda]
+  caption: [distribuição de `trips` sem zeros]
 )
 
-]
 ] <f539d346-9f7c-476c-a203-c2ba58e4e7b4>
 #block[
 Observamos que a grande maioria dos valores está abaixo de 20, com
@@ -147,8 +185,8 @@ na de trips!).
 #block[
 #block[
 #figure(
-  image("./media/78f196e369d7221ec4177bb338a7b0829a18b51a.png"),
-  caption: [legenda]
+  image("./media/5101b4e456fc42fcd338a5cfa6bbcbfd7bb016a4.png"),
+  caption: [distribuição de `quality` e sua relação com `trips`]
 )
 
 ]
@@ -174,28 +212,20 @@ pessoas que não visitaram tanto o lago.
 #block[
 #block[
 ```
-ski
+Value counts de ski
 0    417
 1    242
-Name: count, dtype: int64
+
 ```
 
 ]
 ] <2527517d-bbed-427d-abd3-c4be8d04f303>
 #block[
-#block[
-```
-Text(0.5, 0, 'Trips (ski é 1)')
-```
-
-]
-#block[
 #figure(
   image("./media/927058aa580a326f8637d203477f76c14fd9ff4a.png"),
-  caption: [legenda]
+  caption: [distribuição de `trips` dado o valor de `ski`]
 )
 
-]
 ] <37734852-51d0-4de2-9435-bc5a05f7f5f7>
 #block[
 A quarta variável, `income`, corresponde à renda familiar do
@@ -208,7 +238,7 @@ interpretação válida.
 
 Essa variável não tem valores nulos ou faltantes, e suas estatísticas,
 em conjunto com seu histograma, indicam que não há outliers e que seu
-intervalo é bem definido (1 à 9).
+intervalo é bem definido (1 a 9).
 
 ] <b5ad39ec-039f-4151-9fd2-8b53b5145560>
 #block[
@@ -222,8 +252,8 @@ intervalo é bem definido (1 à 9).
 #block[
 #block[
 #figure(
-  image("./media/6abb1a31f9ddeb5bbf33b825f27b3b0698a85a8c.png"),
-  caption: [legenda]
+  image("./media/bf602efb56a749deff0f21890559298fd67ea1f1.png"),
+  caption: [distribuição de `income` e sua relação com `trips`]
 )
 
 ]
@@ -245,10 +275,9 @@ passeios que eles fizeram tem uma range ampla, mas acima de 3.
 #block[
 #block[
 ```
-userfee
+Value counts de userfee
 0    646
 1     13
-Name: count, dtype: int64
 ```
 
 ]
@@ -257,7 +286,7 @@ Name: count, dtype: int64
 #block[
 #figure(
   image("./media/f24f7cb66c6ce2c23f69f063841a0bac765f21f9.png"),
-  caption: [legenda]
+  caption: [distribuição de `trips` dado o valor de `userfee`]
 )
 
 ]
@@ -283,7 +312,7 @@ observamos que elas tem a distribuição muito próxima.
 #block[
 #figure(
   image("./media/9e845cee334d3db5277f9925646c84dbb4cbd948.png"),
-  caption: [legenda]
+  caption: [distribuição de `costC`, `costS` e `costH`]
 )
 
 ]
@@ -299,7 +328,7 @@ interesse.
 #block[
 #figure(
   image("./media/9c8d7ff1ccc06ba976173871cb59c8f6cd87fd4c.png"),
-  caption: [legenda]
+  caption: [relacionamentos das variáveis `cost` com `trips` e com elas mesmas]
 )
 
 ]
@@ -308,7 +337,7 @@ interesse.
 Após inspecionar esses scatterplots, esperamos que:
 
 - A correlação entre as variáveis de custo seja #strong[muito] alta;
-- A correlação delas com a variável de interesse seja baixa, já que a
+- A correlação delas com a variável de interesse seja baixa em módulo, já que a
   relação não parece ser linear.
 
 Verificaremos isso fazendo uma matriz de correlação entre as variáveis
@@ -318,8 +347,8 @@ do nosso dataset:
 #block[
 #block[
 #figure(
-  image("./media/eaf0633fc26f530892e786d24badaeefd34bde66.png"),
-  caption: [legenda]
+  image("./media/eaf0633fc26f530892e786d24badaeefd34bde66.png", width: 80%),
+  caption: [correlação entre as variáveis da base]
 )
 
 ]
@@ -337,14 +366,11 @@ Inflação de Variância (em inglês, VIF).
 ] <3cc916af-25c5-428d-9c1f-76de6a54f317>
 #block[
 #block[
+  #set text(size: 7pt)
 ```
-               0         1         2         3           4          5  \
-coluna   quality       ski    income   userfee       costC      costS   
-VIF     1.717989  1.792726  3.190647  1.065486  131.397142  61.328934   
-
-                6  
-coluna      costH  
-VIF     93.752282  
+              0        1        2         3          4         5        6  
+coluna  quality      ski   income   userfee      costC     costS    costH  
+VIF       1.717    1.792    3.190     1.065    131.397    61.328   93.752
 ```
 
 ]
@@ -380,10 +406,11 @@ tempo, manter duas delas segue fazendo o VIF delas ser alto:
 ] <2fa793e0-6b7c-4b39-b30d-042d100de13d>
 #block[
 #block[
+  #set text(size: 7pt)
 ```
                0         1         2         3         4          5
 coluna   quality       ski    income   userfee     costS      costH
-VIF     1.712896  1.785848  3.115096  1.062281  42.90048  40.775716
+VIF        1.712     1.785     3.115     1.062      42.9     40.775
 ```
 
 ]
@@ -401,45 +428,59 @@ complexidade da base, uma transformação possível é introduzir uma coluna
 - 0 (falso) caso contrário.
 
 ] <d55ea8e5-0648-4d9f-9da7-9e2c1adfded2>
+
 #block[
 #block[
+```
+Value counts de isCheapest
+0    505
+1    154
+```
+#block[
+```
+Correlacao entre trips e isCheapest: 0.4399
+```
+]
+]
+] <9bbe6d51-33de-40e9-af8f-a1dcc4707bcf>
+
+#block[
+#block[
+  #set text(size: 7pt)
 ```
                0         1         2         3         4           5
 coluna   quality       ski    income   userfee     costS  isCheapest
-VIF     1.899121  1.785035  3.042713  1.081909  2.352996    1.554768
+VIF        1.899     1.785     3.042     1.081     2.352       1.554
 ```
 
 ]
+
+
 ] <968df9da-ac17-43dc-a488-dc52b9e45186>
-#block[
-#block[
-```
-isCheapest
-0    505
-1    154
-Name: count, dtype: int64
-```
 
-]
-] <9bbe6d51-33de-40e9-af8f-a1dcc4707bcf>
 #block[
 #block[
 #figure(
   image("./media/6bbacf0fb3e8617be04042af2a40d66061e09a95.png"),
-  caption: [legenda]
+  caption: [distribuição de `trips` dado `isCheapest`]
 )
 
 ]
 ] <b30dea9c-cce8-4fa7-8b82-98adaaf8ccee>
 #block[
-#block[
-#figure(
-  image("./media/471754615e194fe0c91aaf462b240421650e7c68.png"),
-  caption: [legenda]
-)
 
-]
+
+  
+//#block[
+//#figure(
+//  image("./media/471754615e194fe0c91aaf462b240421650e7c68.png"),
+//  caption: [legenda]
+//)
+//]
+
 ] <cea7d11d-09b7-489a-9102-b8a206706aca>
+
+
 #block[
 A análise dessa nova variável parece mostrar que ela pode ser uma boa
 escolha para o ajuste do modelo, por mitigar os problemas causados pelas
@@ -454,6 +495,7 @@ mais de um modelo, com diferentes escolhas de variáveis, e analisar qual
 se ajusta melhor aos dados.
 
 == 2. Ajustando modelos Poisson
+#linebreak()
 <2-ajustando-modelos-poisson>
 Aqui, serão ajustados 3 modelos lineares generalizados da família
 Poisson, devido à natureza da variável dependente. A função de ligação
@@ -475,9 +517,8 @@ terceiro com a `costS` e a nova variável `isCheapest`.
 ] <a6aba904-2273-47ee-8301-3cae033b60d0>
 #block[
 #block[
+  #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
                  Generalized Linear Model Regression Results                  
 ==============================================================================
 Dep. Variable:                  trips   No. Observations:                  659
@@ -485,10 +526,10 @@ Model:                            GLM   Df Residuals:                      651
 Model Family:                 Poisson   Df Model:                            7
 Link Function:                    Log   Scale:                          1.0000
 Method:                          IRLS   Log-Likelihood:                -1529.4
-Date:                Mon, 02 Jun 2025   Deviance:                       2305.8
-Time:                        11:43:35   Pearson chi2:                 4.10e+03
+Date:                Wed, 04 Jun 2025   Deviance:                       2305.8
+Time:                        01:29:46   Pearson chi2:                 4.10e+03
 No. Iterations:                     8   Pseudo R-squ. (CS):             0.9789
-Covariance Type:            nonrobust                                         
+AIC:                        3074.8626   BIC:                        -1919.6755
 ==============================================================================
                  coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
@@ -501,50 +542,17 @@ costC         -0.0034      0.003     -1.100      0.271      -0.010       0.003
 costS         -0.0425      0.002    -25.466      0.000      -0.046      -0.039
 costH          0.0361      0.003     13.335      0.000       0.031       0.041
 ==============================================================================
-"""
 ```
 
 ]
-] <c48d8434-c803-432e-a545-6a560c2b9c5d>
-#block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-               Results: Generalized linear model
-===============================================================
-Model:              GLM              AIC:            3074.8626 
-Link Function:      Log              BIC:            -1919.6755
-Dependent Variable: trips            Log-Likelihood: -1529.4   
-Date:               2025-06-02 11:43 LL-Null:        -2801.4   
-No. Observations:   659              Deviance:       2305.8    
-Df Model:           7                Pearson chi2:   4.10e+03  
-Df Residuals:       651              Scale:          1.0000    
-Method:             IRLS                                       
-----------------------------------------------------------------
-            Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
-----------------------------------------------------------------
-const       0.2650    0.0937    2.8274  0.0047   0.0813   0.4487
-quality     0.4717    0.0171   27.6016  0.0000   0.4382   0.5052
-ski         0.4182    0.0572    7.3126  0.0000   0.3061   0.5303
-income     -0.1113    0.0196   -5.6831  0.0000  -0.1497  -0.0729
-userfee     0.8982    0.0790   11.3713  0.0000   0.7434   1.0530
-costC      -0.0034    0.0031   -1.1000  0.2713  -0.0095   0.0027
-costS      -0.0425    0.0017  -25.4657  0.0000  -0.0458  -0.0393
-costH       0.0361    0.0027   13.3353  0.0000   0.0308   0.0414
-===============================================================
 
-"""
-```
-
-]
 ] <50b233a9-bb53-4af2-b6d2-41e474947353>
 #block[
 Observamos que o modelo com todas as variáveis apresenta um
 pseudo-$R_(C S)^2$ de aproximadamente $0 , 98$. Essa métrica é o
 pseudo-$R^2$ de Cox e Snell, usado em modelos lineares generalizados e
 parametrizado como
-$R_(C S)^2 = 1 - e x p { 2 / n (l n (L_0) - l n (L_M)) }$. Ele é uma
+$R_(C S)^2 = 1 - exp{ 2 / n (ln(L_0) - ln(L_M)) }$. Ele é uma
 generalização do $R^2$ já conhecido para modelos que não são ajustados
 por mínimos quadrados, e sim por maxima verossimilhança.
 
@@ -562,66 +570,34 @@ interferir nas estatísticas e testes do modelo.
 ] <a0b00dcb-d339-4fb3-8539-8f882ff64e9f>
 #block[
 #block[
+  #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-               Results: Generalized linear model
-===============================================================
-Model:              GLM              AIC:            3452.5604 
-Link Function:      Log              BIC:            -1550.9591
-Dependent Variable: trips            Log-Likelihood: -1720.3   
-Date:               2025-06-02 11:43 LL-Null:        -2801.4   
-No. Observations:   659              Deviance:       2687.5    
-Df Model:           5                Pearson chi2:   5.82e+03  
-Df Residuals:       653              Scale:          1.0000    
-Method:             IRLS                                       
-----------------------------------------------------------------
-            Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
-----------------------------------------------------------------
-const       0.5861    0.0919    6.3771  0.0000   0.4060   0.7662
-quality     0.5408    0.0159   33.9241  0.0000   0.5096   0.5721
-ski         0.4542    0.0565    8.0440  0.0000   0.3435   0.5649
-income     -0.1578    0.0195   -8.0930  0.0000  -0.1961  -0.1196
-userfee     1.1015    0.0799   13.7860  0.0000   0.9449   1.2581
-costS      -0.0153    0.0010  -15.0975  0.0000  -0.0173  -0.0133
-===============================================================
-
-"""
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                  trips   No. Observations:                  659
+Model:                            GLM   Df Residuals:                      653
+Model Family:                 Poisson   Df Model:                            5
+Link Function:                    Log   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -1720.3
+Date:                Wed, 04 Jun 2025   Deviance:                       2687.5
+Time:                        01:29:46   Pearson chi2:                 5.82e+03
+No. Iterations:                     6   Pseudo R-squ. (CS):             0.9624
+AIC:                        3452.5604   BIC:                        -1550.9591
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.5861      0.092      6.377      0.000       0.406       0.766
+quality        0.5408      0.016     33.924      0.000       0.510       0.572
+ski            0.4542      0.056      8.044      0.000       0.344       0.565
+income        -0.1578      0.020     -8.093      0.000      -0.196      -0.120
+userfee        1.1015      0.080     13.786      0.000       0.945       1.258
+costS         -0.0153      0.001    -15.098      0.000      -0.017      -0.013
+==============================================================================
 ```
 
 ]
 ] <f17c7bf9-2df5-4c20-83f7-6f22de0065d6>
-#block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-               Results: Generalized linear model
-===============================================================
-Model:              GLM              AIC:            3452.5604 
-Link Function:      Log              BIC:            -1550.9591
-Dependent Variable: trips            Log-Likelihood: -1720.3   
-Date:               2025-06-02 11:43 LL-Null:        -2801.4   
-No. Observations:   659              Deviance:       2687.5    
-Df Model:           5                Pearson chi2:   5.82e+03  
-Df Residuals:       653              Scale:          1.0000    
-Method:             IRLS                                       
-----------------------------------------------------------------
-            Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
-----------------------------------------------------------------
-const       0.5861    0.0919    6.3771  0.0000   0.4060   0.7662
-quality     0.5408    0.0159   33.9241  0.0000   0.5096   0.5721
-ski         0.4542    0.0565    8.0440  0.0000   0.3435   0.5649
-income     -0.1578    0.0195   -8.0930  0.0000  -0.1961  -0.1196
-userfee     1.1015    0.0799   13.7860  0.0000   0.9449   1.2581
-costS      -0.0153    0.0010  -15.0975  0.0000  -0.0173  -0.0133
-===============================================================
 
-"""
-```
-
-]
-] <e86ac693-fe71-4ef2-bee2-3f994fe55ab4>
 #block[
 Removendo as variáveis de custo que não são referentes ao lago
 Sommerville, observamos uma piora em algumas métricas: o AIC e Deviance
@@ -636,9 +612,8 @@ suas estatísticas.
 ] <ddfda176-2438-4d78-9773-5d8c258314c8>
 #block[
 #block[
+    #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
                  Generalized Linear Model Regression Results                  
 ==============================================================================
 Dep. Variable:                  trips   No. Observations:                  659
@@ -646,10 +621,10 @@ Model:                            GLM   Df Residuals:                      652
 Model Family:                 Poisson   Df Model:                            6
 Link Function:                    Log   Scale:                          1.0000
 Method:                          IRLS   Log-Likelihood:                -1434.1
-Date:                Mon, 02 Jun 2025   Deviance:                       2115.1
-Time:                        11:43:35   Pearson chi2:                 4.04e+03
+Date:                Wed, 04 Jun 2025   Deviance:                       2115.1
+Time:                        01:29:46   Pearson chi2:                 4.04e+03
 No. Iterations:                     6   Pseudo R-squ. (CS):             0.9842
-Covariance Type:            nonrobust                                         
+AIC:                        2882.1280   BIC:                        -2116.9007
 ==============================================================================
                  coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
@@ -661,43 +636,10 @@ userfee        0.6083      0.081      7.508      0.000       0.450       0.767
 costS         -0.0093      0.001     -9.947      0.000      -0.011      -0.007
 isCheapest     1.5037      0.067     22.541      0.000       1.373       1.634
 ==============================================================================
-"""
 ```
 
 ]
 ] <705ffc6f-67cb-40fe-92fd-7443d9b48af4>
-#block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-               Results: Generalized linear model
-===============================================================
-Model:              GLM              AIC:            2882.1280 
-Link Function:      Log              BIC:            -2116.9007
-Dependent Variable: trips            Log-Likelihood: -1434.1   
-Date:               2025-06-02 11:43 LL-Null:        -2801.4   
-No. Observations:   659              Deviance:       2115.1    
-Df Model:           6                Pearson chi2:   4.04e+03  
-Df Residuals:       652              Scale:          1.0000    
-Method:             IRLS                                       
-----------------------------------------------------------------
-             Coef.   Std.Err.     z     P>|z|    [0.025   0.975]
-----------------------------------------------------------------
-const       -0.4750    0.1075  -4.4181  0.0000  -0.6857  -0.2643
-quality      0.4259    0.0177  24.0258  0.0000   0.3911   0.4606
-ski          0.4920    0.0554   8.8816  0.0000   0.3835   0.6006
-income      -0.0768    0.0187  -4.0987  0.0000  -0.1135  -0.0401
-userfee      0.6083    0.0810   7.5079  0.0000   0.4495   0.7671
-costS       -0.0093    0.0009  -9.9470  0.0000  -0.0111  -0.0074
-isCheapest   1.5037    0.0667  22.5405  0.0000   1.3729   1.6344
-===============================================================
-
-"""
-```
-
-]
-] <450e7648-8606-4bd3-9967-fe9aa77d0763>
 #block[
 O terceiro modelo apresenta todas as métricas melhores: seu AIC e sua
 Deviance são menores que dos outros, indicando que mesmo com menos
@@ -731,7 +673,7 @@ previsão do modelo).
 #block[
 #figure(
   image("./media/10c8bbe9d05a9c6ab671fe65ab7bffabca107143.png"),
-  caption: [legenda]
+  caption: [plot dos resíduos para os três modelos Poisson]
 )
 
 ]
@@ -770,6 +712,7 @@ esperado, o teste será conduzido com o terceiro modelo, que faz uso da
 nova variável criada para o dataset.
 
 == 3. Testando a sobredispersão
+#linebreak()
 <3-testando-a-sobredispersão>
 Para esse teste, queremos saber se rejeitamos ou não a hipotese nula:
 para uma parametrização da variância como $V a r (Y) = mu + alpha mu^2$,
@@ -781,18 +724,17 @@ em $hat(mu)_i$ obtidos foram:
 ] <8650ba12-22f0-4f93-9053-fc9692eec9f9>
 #block[
 #block[
+    #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
-                                 OLS Regression Results                                
-=======================================================================================
-Dep. Variable:                      y   R-squared (uncentered):                   0.010
-Model:                            OLS   Adj. R-squared (uncentered):              0.009
-Method:                 Least Squares   F-statistic:                              6.888
-Date:                Mon, 02 Jun 2025   Prob (F-statistic):                     0.00888
-Time:                        11:43:35   Log-Likelihood:                         -3572.5
-No. Observations:                 659   AIC:                                      7147.
-Df Residuals:                     658   BIC:                                      7151.
+                           OLS Regression Results
+==============================================================================
+Dep. Variable:                      y   R-squared (uncentered):          0.010
+Model:                            OLS   Adj. R-squared (uncentered):     0.009
+Method:                 Least Squares   F-statistic:                     6.888
+Date:                Wed, 04 Jun 2025   Prob (F-statistic):            0.00888
+Time:                        01:29:47   Log-Likelihood:                -3572.5
+No. Observations:                 659   AIC:                              7147.
+Df Residuals:                     658   BIC:                              7151.
 Df Model:                           1                                                  
 Covariance Type:            nonrobust                                                  
 ==============================================================================
@@ -800,16 +742,6 @@ Covariance Type:            nonrobust
 ------------------------------------------------------------------------------
 x1             1.2061      0.460      2.624      0.009       0.304       2.109
 ==============================================================================
-Omnibus:                     1515.886   Durbin-Watson:                   1.038
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):          5268993.461
-Skew:                          19.789   Prob(JB):                         0.00
-Kurtosis:                     439.262   Cond. No.                         1.00
-==============================================================================
-
-Notes:
-[1] R² is computed without centering (uncentered) since the model does not contain a constant.
-[2] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-"""
 ```
 
 ]
@@ -828,17 +760,19 @@ sobre os dados. Por isso, é importante usar modelos que são pensados
 para lidar com esse tipo de fenômeno.
 
 == 4. Modelo Binomial Negativo
+#linebreak()
 <4-modelo-binomial-negativo>
 O modelo em questão, que consegue levar a sobredispersão em conta em seu
 ajuste, é um modelo da família Binomial Negativa. Esse modelo, assim
 como o de Poisson, modela dados cujo domínio é o conjunto dos números
 naturais. A parametrização desse modelo lembra o teste que foi feito
 acima:
-
-$ E [Y_i \| X_i] = mu_i = exp { x_i^T beta } $
-
-$ V a r (Y_i \| X_i) = mu_i + alpha mu_i^2 $
-
+$
+cases(
+  EE [Y_i \| X_i] = mu_i = exp { x_i^T beta },
+  V a r [Y_i \| X_i] = mu_i + alpha mu_i^2
+)
+$
 Essa variância é o que modela a sobredispersão: o valor $alpha$ é
 estimado junto com o $beta$, e então o ajuste leva em conta a
 sobredispersão, e o parâmetro $alpha$ ganha uma estimativa $hat(alpha)$
@@ -847,40 +781,21 @@ positivos, e como os dados de contagem geralmente abrangem várias
 magnitudes (como vimos no nosso dataset também), a função de link deste
 modelo é o logarítmo natural, função inversa da exponencial.
 
-] <0aa169d1-13f4-480b-ab41-7685ac60eae2>
+<0aa169d1-13f4-480b-ab41-7685ac60eae2>
 #block[
-#block[
+#set text(size: 6.5pt)
 ```
-Optimization terminated successfully.
-         Current function value: 1.269525
-         Iterations: 32
-         Function evaluations: 39
-         Gradient evaluations: 39
-```
-
-]
-#block[
-```
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:3379: RuntimeWarning: divide by zero encountered in log
-  llf = coeff + size*np.log(prob) + endog*np.log(1-prob)
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:3379: RuntimeWarning: invalid value encountered in multiply
-  llf = coeff + size*np.log(prob) + endog*np.log(1-prob)
-```
-
-]
-#block[
-```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
                      NegativeBinomial Regression Results                      
 ==============================================================================
-Dep. Variable:                  trips   No. Observations:                  659
-Model:               NegativeBinomial   Df Residuals:                      652
-Method:                           MLE   Df Model:                            6
-Date:                Mon, 02 Jun 2025   Pseudo R-squ.:                  0.2142
-Time:                        11:43:35   Log-Likelihood:                -836.62
+Dep. Variable:                  trips   Df Residuals:                      652
+Model:               NegativeBinomial   Df Model:                            6
+Method:                           MLE   Deviance:                       439.04
+Date:                Wed, 04 Jun 2025   Pseudo R-squ.:                  0.2142
+Time:                        01:29:47   Log-Likelihood:                -836.62
 converged:                       True   LL-Null:                       -1064.7
 Covariance Type:            nonrobust   LLR p-value:                 2.260e-95
+No. Observations:                 659   AIC:                         1689.2337
+BIC:                        1725.1595
 ==============================================================================
                  coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
@@ -893,48 +808,13 @@ costS         -0.0057      0.002     -2.899      0.004      -0.010      -0.002
 isCheapest     1.7376      0.156     11.154      0.000       1.432       2.043
 alpha          1.4219      0.150      9.454      0.000       1.127       1.717
 ==============================================================================
-"""
 ```
 
 ]
 ] <959f0a46-2023-4bf9-8389-5767df384e38>
-#block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-                    Results: NegativeBinomial
-=================================================================
-Model:              NegativeBinomial Pseudo R-squared: 0.214     
-Dependent Variable: trips            AIC:              1689.2337 
-Date:               2025-06-02 11:43 BIC:              1725.1595 
-No. Observations:   659              Log-Likelihood:   -836.62   
-Df Model:           6                LL-Null:          -1064.7   
-Df Residuals:       652              LLR p-value:      2.2595e-95
-Converged:          1.0000           Scale:            1.0000    
-Method:             MLE                                          
-------------------------------------------------------------------
-               Coef.   Std.Err.     z     P>|z|    [0.025   0.975]
-------------------------------------------------------------------
-const         -1.6855    0.2280  -7.3926  0.0000  -2.1324  -1.2387
-quality        0.7132    0.0458  15.5817  0.0000   0.6235   0.8029
-ski            0.6324    0.1526   4.1430  0.0000   0.3332   0.9315
-income        -0.0595    0.0452  -1.3166  0.1880  -0.1480   0.0291
-userfee        0.7272    0.3642   1.9965  0.0459   0.0133   1.4411
-costS         -0.0057    0.0020  -2.8992  0.0037  -0.0096  -0.0019
-isCheapest     1.7376    0.1558  11.1538  0.0000   1.4323   2.0430
-alpha          1.4219    0.1504   9.4545  0.0000   1.1271   1.7167
-=================================================================
 
-"""
-```
-
-]
-] <d1921e4b-9562-4575-ac36-d68f3a8bb0d0>
 #block[
-] <4a30495f-453e-4c84-a9aa-5bb2e9514c1a>
-#block[
-Observamos que após o fit, o resultado contém as estimativas para os
+Observamos que após o ajuste, o resultado contém as estimativas para os
 regressores e também para o parâmetro da sobredispersão. A métrica do
 pseudo-$R^2$ se mostrou bem menor em relação ao que estava sendo visto
 na regressão Poisson, mas isso é esperado: o Modelo Poisson ignorava a
@@ -946,27 +826,21 @@ pseudo-$R^2$.
 
 Isso se reflete em um valor mais baixo, mas mais real e útil para
 comparação de possíveis modelos com essa parametrização (ele não está
-jogado para perto do 1, o que pode facilitar comparações).
+jogado para perto do 1, o que pode facilitar comparações). Já o valor da
+Deviance é bem menor que o final dos outros modelos, indicando um melhor
+ajuste geral aos dados, com menos erros de previsão. Assim como feito
+nos modelos Poisson, é possível analisar o plot dos resíduos de Pearson:
 
 ] <378e3978-b065-4b83-8c29-5407f72459b8>
 #block[
-#block[
-```
-Text(0, 0.5, 'Resíduos de Pearson')
-```
-
-]
-#block[
 #figure(
   image("./media/010212c309a47f74a39e499a1bb8c5cff7934852.png"),
-  caption: [legenda]
+  caption: [plot dos resíduos para o modelo Binomial Negativa]
 )
 
-]
 ] <ddf62c61-5c38-46e7-8b15-4547ad573e30>
 #block[
-Observando o scatter plot dos resíduos contra os valores ajustados,
-vemos que agora os resíduos se concentram dentro do range (-2, 2), ao
+Vemos que agora os resíduos se concentram dentro do range (-2, 2), ao
 contrários dos resíduos dos modelos Poisson treinados, que eram muito
 mais dispersos. Isso indica que o modelo conseguiu lidar melhor com a
 sobredispersão dos dados, fazendo previsões mais \"amplas\". Esse
@@ -976,9 +850,14 @@ dados e todos os seus fenômenos intrinsecos.
 É preciso ressaltar, porém, que os resíduos ainda apresentam
 comportamentos estranhos. Assim como ocorreu com os modelos Poisson, os
 resíduos negativos se concentram no intervalo esperado, enquanto alguns
-positivos são muito espalhados. Esse último comportamento é
-especialmente predominante em predições que foram próximas de 0. Esse
-comportamento leva a conclusão de que:
+positivos são muito espalhados. 
+
+Esse resultado é de certa forma esperado, já que o domínio dos dados 
+impede que o erro seja muito baixo (significaria uma previsão negativa). 
+O que causa estranheza é esse comportamento ser especialmente predominante 
+em predições que foram próximas de 0: o plot forma uma espécie de \"L\" 
+espelhado, com muitos valores preditos errôneamente como zeros. Disso 
+concluímos que:
 
 - O modelo está errando mais para baixo do que para cima, ou seja, está
   predizendo muitos valores abaixo do esperado.
@@ -987,243 +866,208 @@ comportamento leva a conclusão de que:
 
 Esses são sintomas de que o modelo está predizendo valores abaixo dos
 que deveria predizer muito frequentemente, fugindo do comportamento que
-se esperaria ver normalmente.
+se esperaria ver normalmente. Uma das possíveis causas para isso é a
+quantidade de entradas com zeros na base de dados.
 
-== Questão 5 - Modelo inflado de zeros
-<questão-5---modelo-inflado-de-zeros>
+== 5. Modelo inflado de zeros
+#linebreak()
+<5-modelo-inflado-de-zeros>
+Como reportado no ínicio, muitos registros da base de dados original tem
+a variável `trips` como 0. Os modelos treinados também fazem bastante
+previsões zero:
+
 ] <e3501a11-5edf-4871-9c30-22c1bffb8533>
 #block[
+```
+'Zeros na variável trip: 417'
+```
+] <7a8f9112-9bc9-45d3-9c6b-4d12c9963091>
+#block[
+```
+'Zeros previstos pelo modelo Binomial Negativo: 458'
+```
 ] <17dbfa03-4722-4889-a167-7bffd3492c5c>
 #block[
-] <76a890ef-de64-443f-9942-46dd801e2109>
-#block[
-] <59efda90-cb9a-4d32-8d32-9a6dbf358f93>
-#block[
-#block[
 ```
-Optimization terminated successfully.
-         Current function value: 2.109287
-         Iterations: 26
-         Function evaluations: 31
-         Gradient evaluations: 31
+'Zeros previstos pelo terceiro modelo Poisson: 339'
 ```
+] <7aa6399d-7c3c-4859-8bb4-1cb1a9e7f65c>
+#block[
+Como a saída dos modelos são números reais, contei como zero qualquer
+valor abaixo de 0,5. Os zeros presentes na base de dados estão em muito
+maior quantidade do que se espera de uma distribuição Poisson com a
+média que os dados tem. Isso pode ser um sinal de #strong[zeros
+estruturais];.
 
-]
+O conceito de zero estrutural é associado à ideia de dividir as
+observações 0 de uma base de dados em duas categorias: zeros gerados
+pela distribuição modelada pelo modelo de contagem e zeros gerados por
+uma outra distribuição binária. Esses segundos zeros não seriam gerados
+pela disstribuição do modelo inicial, e por isso fazer um ajuste puro
+dele poderia ignorar essa característica dos dados.
+
+Uma das formas de lidar com esse tipo de observação é usando modelos
+inflados de zeros. Eles consistem em modelos de contagem já conhecidos
+combinados com modelos de classificação binária. Assim, o modelo de
+classificação binária modela a probabilidade de uma observação zero ser
+estrutural, e o treino do modelo de contagem leva isso em conta.
+
+Formalmente, sendo $pi$ a probabilidade de uma observação ser um zeros
+estrutural e $1 - pi$ a probabilidade de uma observação ter sido gerada
+de um modelo poisson com parâmetro $mu$, temos:
+
+$ p (y_n \| pi , mu) = cases(delim: "{", pi + (1 - pi) "Poisson"(0 \| mu) & upright("se ") y_n upright(" = 0;"), (1 - pi) "Poisson"(y_n \| mu) & upright("caso contrário") .) $
+
+O valor $pi$ é também expresso como um modelo em função dos dados que
+fornece diferentes valores de $pi$ para diferentes registros dos dados,
+por meio também de um GLM (com função de ligação logit ou probit, já que
+o interesse é ter $pi in [0 , 1]$). A estimativa de $pi$ pode ser feita
+utilizando um conjunto diferente de colunas do que o usado no modelo de
+contagem, e essa abordagem pode ser melhor caso seja possível separar
+intuitivamente quais variáveis influenciariam na observação ser um zero
+estrutural ou não.
+
+No caso dos dados de passeios, para ajustar o modelo de inflação usarei
+apenas a variável `quality` e um intercepto. Essa escolha se deu pela
+descrição do dataset, que deixa explicito que valores 0 na variável
+`quality` indicam pessoas que não visitaram o lago.
+
+] <c6658a67-39e6-40d1-be15-3f91a1ac8cb9>
 #block[
+  #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
                      ZeroInflatedPoisson Regression Results                    
-===============================================================================
-Dep. Variable:                   trips   No. Observations:                  659
-Model:             ZeroInflatedPoisson   Df Residuals:                      652
-Method:                            MLE   Df Model:                            6
-Date:                 Mon, 02 Jun 2025   Pseudo R-squ.:                  0.2068
-Time:                         11:43:35   Log-Likelihood:                -1390.0
-converged:                        True   LL-Null:                       -1752.5
-Covariance Type:             nonrobust   LLR p-value:                2.579e-153
-=================================================================================
-                    coef    std err          z      P>|z|      [0.025      0.975]
----------------------------------------------------------------------------------
-inflate_const    -0.5157      0.129     -3.994      0.000      -0.769      -0.263
-const             0.3076      0.126      2.450      0.014       0.062       0.554
-quality           0.2961      0.022     13.669      0.000       0.254       0.339
-ski               0.5072      0.057      8.826      0.000       0.395       0.620
-income           -0.0760      0.020     -3.826      0.000      -0.115      -0.037
-userfee           0.5418      0.081      6.717      0.000       0.384       0.700
-costS            -0.0100      0.001    -10.233      0.000      -0.012      -0.008
-isCheapest        1.2825      0.072     17.754      0.000       1.141       1.424
-=================================================================================
-"""
+================================================================================
+Dep. Variable:                   trips    No. Observations:                  659
+Model:             ZeroInflatedPoisson    Df Residuals:                      652
+Method:                            MLE    Df Model:                            6
+Date:                 Wed, 04 Jun 2025    Pseudo R-squ.:                  0.3457
+Time:                         01:29:47    Log-Likelihood:                -1146.6
+converged:                        True    LL-Null:                       -1752.5
+Covariance Type:             nonrobust    LLR p-value:                1.333e-258
+AIC:                         2311.1265    BIC:                         2351.5430
+================================================================================
+                     coef    std err          z      P>|z|     [0.025     0.975]
+--------------------------------------------------------------------------------
+inflate_const      5.2892      0.806      6.564      0.000      3.710      6.869
+inflate_quality   -6.6033      0.976     -6.768      0.000     -8.516     -4.691
+const              1.3046      0.127     10.241      0.000      1.055      1.554
+quality            0.0606      0.024      2.576      0.010      0.014      0.107
+ski                0.4822      0.056      8.619      0.000      0.373      0.592
+income            -0.0868      0.019     -4.557      0.000     -0.124     -0.049
+userfee            0.5426      0.080      6.782      0.000      0.386      0.699
+costS             -0.0089      0.001     -9.265      0.000     -0.011     -0.007
+isCheapest         1.1095      0.065     16.988      0.000      0.982      1.238
+================================================================================
 ```
-
-]
 ] <0428f21c-b895-4f1d-b81d-990897f71e40>
 #block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-                    Results: ZeroInflatedPoisson
-=====================================================================
-Model:              ZeroInflatedPoisson Pseudo R-squared: 0.207      
-Dependent Variable: trips               AIC:              2796.0403  
-Date:               2025-06-02 11:43    BIC:              2831.9661  
-No. Observations:   659                 Log-Likelihood:   -1390.0    
-Df Model:           6                   LL-Null:          -1752.5    
-Df Residuals:       652                 LLR p-value:      2.5787e-153
-Converged:          1.0000              Scale:            1.0000     
-Method:             MLE                                              
-----------------------------------------------------------------------
-                  Coef.   Std.Err.     z      P>|z|    [0.025   0.975]
-----------------------------------------------------------------------
-inflate_const    -0.5157    0.1291   -3.9943  0.0001  -0.7688  -0.2627
-const             0.3076    0.1256    2.4503  0.0143   0.0616   0.5537
-quality           0.2961    0.0217   13.6692  0.0000   0.2537   0.3386
-ski               0.5072    0.0575    8.8264  0.0000   0.3946   0.6198
-income           -0.0760    0.0199   -3.8259  0.0001  -0.1149  -0.0371
-userfee           0.5418    0.0807    6.7168  0.0000   0.3837   0.6999
-costS            -0.0100    0.0010  -10.2328  0.0000  -0.0120  -0.0081
-isCheapest        1.2825    0.0722   17.7544  0.0000   1.1410   1.4241
-=====================================================================
+Observamos que o modelo apresenta todos os estimadores como
+estatisticamente significativos. Também observamos um valor de
+pseudo-$R^2$ maior do que o atingido com o modelo da família Binomial
+Negativa. Nos modelos inflados de zeros, não é possível usar a Deviance
+para comparações, já que esses modelos não são GLMs por definição, e
+portanto essa métrica não é adequada.
 
-"""
-```
-
-]
-] <5083b118-42b3-4c38-933f-b936826b2ee0>
-#block[
-#block[
-```
-Text(0, 0.5, 'Resíduos de Pearson')
-```
-
-]
+] <337091f1-86fd-4155-adbf-932e72ec9b6b>
 #block[
 #figure(
-  image("./media/80dc0f54ea4c9b13fce2683f9ff1dcb1dae18735.png"),
-  caption: [legenda]
+  image("./media/7e06e5b2693bba46d4a5a33480e4532922f83a71.png"),
+  caption: [plot dos resíduos para o modelo Poisson inflado de zeros]
 )
-
-]
 ] <a4dea1d0-1973-4551-80d0-6bfde7283fd9>
 #block[
-#block[
-```
-         Current function value: 1.269550
-         Iterations: 35
-         Function evaluations: 38
-         Gradient evaluations: 38
-```
+Analisando os resíduos, vemos que agora temos várias observações
+próximas de zero e com resíduos também próximos de zero. Elas são
+associadas aos casos em que o modelo classificador retornou uma alta
+probabilidade do registro ser um zero estrutural. Nesse plot, porém,
+observamos algo que havia nos primeiros modelos Poisson: resíduos mais
+dispersos do que o esperado, indicando que a sobredispersão existe mesmo
+filtrando corretamente os zeros estruturais.
 
-]
-#block[
-```
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/scipy/optimize/_optimize.py:1313: OptimizeWarning: Maximum number of iterations has been exceeded.
-  res = _minimize_bfgs(f, x0, args, fprime, callback=callback, **opts)
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/statsmodels/base/model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
-  warnings.warn("Maximum Likelihood optimization failed to "
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/statsmodels/base/model.py:595: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
-  warnings.warn('Inverting hessian failed, no bse or cov_params '
-/home/pedro/Modelos/Faculdade/venv/lib/python3.13/site-packages/statsmodels/base/model.py:595: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
-  warnings.warn('Inverting hessian failed, no bse or cov_params '
-```
+Para tentar reduzir esse fenômeno, podemos usar um modelo inflado de
+zeros baseado na família Binomial Negativa:
 
-]
+] <ca8b57e5-e368-4389-9a1e-7415630079b1>
 #block[
+  #set text(size: 6.5pt)
 ```
-<class 'statsmodels.iolib.summary.Summary'>
-"""
-                     ZeroInflatedNegativeBinomialP Regression Results                    
-=========================================================================================
-Dep. Variable:                             trips   No. Observations:                  659
-Model:             ZeroInflatedNegativeBinomialP   Df Residuals:                      652
-Method:                                      MLE   Df Model:                            6
-Date:                           Mon, 02 Jun 2025   Pseudo R-squ.:                  0.2142
-Time:                                   11:43:36   Log-Likelihood:                -836.63
-converged:                                 False   LL-Null:                       -1064.7
-Covariance Type:                       nonrobust   LLR p-value:                 2.297e-95
+                     ZeroInflatedNegativeBinomialP Regression Results
 =================================================================================
-                    coef    std err          z      P>|z|      [0.025      0.975]
+Dep. Variable:                           trips   No. Observations:           659
+Model:           ZeroInflatedNegativeBinomialP   Df Residuals:               652
+Method:                                    MLE   Df Model:                     6
+Date:                         Wed, 04 Jun 2025   Pseudo R-squ.:           0.3160
+Time:                                 01:29:48   Log-Likelihood:         -728.23
+converged:                                True   LL-Null:                -1064.7
+Covariance Type:                     nonrobust   LLR p-value:         4.175e-142
+AIC:                                 1476.4690   BIC:                  1521.3762
+=================================================================================
+                      coef    std err          z     P>|z|     [0.025     0.975]
 ---------------------------------------------------------------------------------
-inflate_const   -10.1471     14.738     -0.688      0.491     -39.033      18.739
-const            -1.6842      0.228     -7.393      0.000      -2.131      -1.238
-quality           0.7132      0.046     15.590      0.000       0.624       0.803
-ski               0.6353      0.153      4.163      0.000       0.336       0.934
-income           -0.0599      0.045     -1.328      0.184      -0.148       0.029
-userfee           0.7821      0.371      2.109      0.035       0.055       1.509
-costS            -0.0057      0.002     -2.903      0.004      -0.010      -0.002
-isCheapest        1.7320      0.156     11.134      0.000       1.427       2.037
-alpha             1.4186      0.150      9.466      0.000       1.125       1.712
+inflate_const       3.9179      0.479      8.172     0.000      2.978      4.858
+inflate_quality    -5.4033      0.780     -6.924     0.000     -6.933     -3.874
+const               0.8416      0.269      3.130     0.002      0.315      1.369
+quality             0.1165      0.053      2.199     0.028      0.013      0.220
+ski                 0.4823      0.136      3.552     0.000      0.216      0.748
+income             -0.0922      0.043     -2.125     0.034     -0.177     -0.007
+userfee             0.5994      0.281      2.136     0.033      0.049      1.149
+costS              -0.0043      0.002     -2.398     0.016     -0.008     -0.001
+isCheapest          1.1739      0.142      8.248     0.000      0.895      1.453
+alpha               0.8399      0.093      9.026     0.000      0.658      1.022
 =================================================================================
-"""
 ```
 
-]
 ] <75927fef-1392-4cd0-a0fd-80a70bf81aab>
-#block[
-#block[
-```
-<class 'statsmodels.iolib.summary2.Summary'>
-"""
-                    Results: ZeroInflatedNegativeBinomialP
-==============================================================================
-Model:              ZeroInflatedNegativeBinomialP Pseudo R-squared: 0.214     
-Dependent Variable: trips                         AIC:              1691.2665 
-Date:               2025-06-02 11:43              BIC:              1731.6830 
-No. Observations:   659                           Log-Likelihood:   -836.63   
-Df Model:           6                             LL-Null:          -1064.7   
-Df Residuals:       652                           LLR p-value:      2.2966e-95
-Converged:          0.0000                        Scale:            1.0000    
-Method:             MLE                                                       
----------------------------------------------------------------------------------
-                  Coef.      Std.Err.       z       P>|z|      [0.025      0.975]
----------------------------------------------------------------------------------
-inflate_const    -10.1471     14.7382    -0.6885    0.4911    -39.0335    18.7393
-const             -1.6842      0.2278    -7.3931    0.0000     -2.1307    -1.2377
-quality            0.7132      0.0457    15.5900    0.0000      0.6235     0.8029
-ski                0.6353      0.1526     4.1631    0.0000      0.3362     0.9344
-income            -0.0599      0.0451    -1.3276    0.1843     -0.1484     0.0285
-userfee            0.7821      0.3708     2.1090    0.0349      0.0553     1.5089
-costS             -0.0057      0.0020    -2.9034    0.0037     -0.0096    -0.0019
-isCheapest         1.7320      0.1556    11.1345    0.0000      1.4271     2.0369
-alpha              1.4186      0.1499     9.4664    0.0000      1.1249     1.7123
-==============================================================================
 
-"""
-```
-
-]
-] <7b8db964-2489-4a49-8643-ffd128c6ae1e>
 #block[
-#block[
-```
-Text(0, 0.5, 'Resíduos de Pearson')
-```
+Quando observamos os valores estimados, percebemos que para as variáveis
+do modelo logístico as estimativas são parecidas, o que pode indicar que
+nos dois métodos o modelo se ajustou para interpretar os zeros
+estruturais de maneira semelhante.
 
-]
+] <829c7d6b-b631-456f-8cbe-b554f1ed679a>
 #block[
 #figure(
-  image("./media/7800ec2a94fba6c359749cbd5a0126442dd90e87.png"),
-  caption: [legenda]
+  image("./media/30e818ec6c2652431a78bd15f994873cfa806320.png"),
+  caption: [plot dos resíduos para o modelo Binomial Negativa inflado de zeros]
 )
 
-]
 ] <98afa06f-7e9b-4c8a-bc24-ed4edcdae389>
 #block[
-#block[
-```
-False    551
-True     108
-Name: count, dtype: int64
-```
+O plot dos resíduos também apresenta uma grande concentração de pontos
+ao redor de $(0 , 0)$, mas não apresenta resíduos muito dispersos ao
+longo dos valores dos preditores. A estimativa do valor $alpha$ indica
+que existia sobredispersão, que foi capturada pelo modelo. Uma métrica
+que pode corroborar para o argumento de que este modelo se saiu melhor é
+o AIC, que é visivelmente mais baixo que o do modelo ZIP.
 
-]
-] <7f8ff8c8-56c8-4cb4-9e4f-7295a51d99f4>
-#block[
-] <1beb6738-1ead-4452-ac6c-ea7e463e68dd>
-#block[
-] <a8b191e6-db2b-4eac-88a4-f313f48600a1>
-#block[
-] <f2d3bd79-96ad-4a4f-bc72-eaca6ad3ad6e>
-#block[
-] <ba24cde5-83be-4b09-b315-e9da3ac744ff>
-#block[
-] <c60e49c3-ac14-4384-822c-6a5b0e7e27d0>
-#block[
-#block[
-```
-<matplotlib.lines.Line2D at 0x7753b57ae350>
-```
+Tendo em vista os plots de resíduos e a métrica citada acima, o modelo
+que eu escolheria para fundamentar análises do assunto seria o
+#strong[modelo da família Binomial Negativa inflado de zeros];. Ele se
+mostrou eficiente em ajustar a sobredispersão dos dados ao mesmo tempo
+em que foi eficiente em identificar os zeros estruturais dos dados.
 
-]
-#block[
-#figure(
-  image("./media/0ae0cdd44a9bcccdd82f30a4cf8a5ef5f0680450.png"),
-  caption: [legenda]
-)
+== 6. Considerações finais e direções futuras
+#linebreak()
+<6-considerações-finais-e-direções-futuras>
+O número de modelos disponíveis na modelagem estatística é grande. Além
+dos modelos testados neste trabalho, seria possível testar modelos de
+hurdle, que usam uma aproximação levemente diferente para a ideia dos
+zeros estruturais, mas que acaba por mudar a forma como eles são
+ajustados. Também seria ideal testar mais transformações entre as
+variáveis, a fim de chegar à um conjunto de variáveis independentes
+robusto para o problema. Isso requer um trabalho de testes e exploração
+extenso, e se beneficia de conhecimentos extras sobre a origem dos
+dados.
 
-]
-] <a53f4d2c-d7f4-4443-ba7a-54d7d309fb73>
-#block[
-] <268a13ec-18c1-40c2-9664-9b6cdcfadf7e>
+== Observação
+#linebreak()
+<observação>
+Para melhor adequação ao formato impresso da entrega do trabalho, o
+código usado para fazer as visualizações e os modelos foi omitido, e
+alguns outputs foram reformatados e combinados com outros para tornar o
+layout mais agradável. O notebook `ipynb` usado para gerar o relatório
+e que contém os outputs originais está disponível no GitHub:
+#underline[#link("https://github.com/pedrotokar/statsmodeling-A2");].
+] <0c265677-fe9a-4604-8c51-2f36df1d59be>
